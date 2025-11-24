@@ -190,6 +190,7 @@ func StartEmbeddedEtcd(logger *logrus.Entry, ro *brtypes.RestoreOptions) (*embed
 	cfg.AutoCompactionMode = ro.Config.AutoCompactionMode
 	cfg.AutoCompactionRetention = ro.Config.AutoCompactionRetention
 	cfg.Logger = "zap"
+	cfg.UnsafeNoFsync = true
 	e, err := embed.StartEtcd(cfg)
 	if err != nil {
 		return nil, err
@@ -202,6 +203,9 @@ func StartEmbeddedEtcd(logger *logrus.Entry, ro *brtypes.RestoreOptions) (*embed
 		e.Close()
 		return nil, fmt.Errorf("server took too long to start")
 	}
+
+	e.Server.AuthStore().AuthDisable()
+
 	return e, nil
 }
 
@@ -713,3 +717,4 @@ func getEtcdWrapperEndpoint(etcdEndpoints []string) (string, error) {
 
 	return fmt.Sprintf("%s://%s:%s", etcdURL.Scheme, etcdURL.Hostname(), etcdWrapperPort), nil
 }
+
