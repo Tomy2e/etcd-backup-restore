@@ -205,6 +205,23 @@ func StartEmbeddedEtcd(logger *logrus.Entry, ro *brtypes.RestoreOptions) (*embed
 	return e, nil
 }
 
+// DisableEmbeddedEtcdAuth disables authentication in embedded etcd if needed.
+// This is required to operate on the embedded etcd without having to provide
+// credentials when recovering from an etcd snapshot that has auth enabled.
+// It returns a function that must be called to reverse the operation.
+func DisableEmbeddedEtcdAuth(e *embed.Etcd) func() error {
+	// If auth is not enabled, there is nothing to do.
+	if !e.Server.AuthStore().IsAuthEnabled() {
+		return func() error { return nil }
+	}
+
+	e.Server.AuthStore().AuthDisable()
+
+	return func() error {
+		return e.Server.AuthStore().AuthEnable()
+	}
+}
+
 // GetKubernetesClientSetOrError creates and returns a kubernetes clientset or an error if creation fails
 func GetKubernetesClientSetOrError() (client.Client, error) {
 	var cl client.Client

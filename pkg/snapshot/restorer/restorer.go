@@ -103,6 +103,7 @@ func (r *Restorer) Restore(ro brtypes.RestoreOptions, m member.Control) (*embed.
 	if err != nil {
 		return e, err
 	}
+	defer miscellaneous.DisableEmbeddedEtcdAuth(e)()
 
 	embeddedEtcdEndpoints := []string{e.Clients[0].Addr().String()}
 

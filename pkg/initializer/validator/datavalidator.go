@@ -371,6 +371,7 @@ func (d *DataValidator) checkFullRevisionConsistency(dataDir string, latestSnaps
 		d.Logger.Infof("unable to start embedded etcd: %v", err)
 		return DataDirectoryCorrupt, err
 	}
+	defer miscellaneous.DisableEmbeddedEtcdAuth(e)()
 	defer func() {
 		e.Server.Stop()
 		e.Close()

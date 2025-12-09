@@ -91,6 +91,7 @@ func (cp *Compactor) Compact(ctx context.Context, opts *brtypes.CompactOptions) 
 		}
 	}
 
+	defer miscellaneous.DisableEmbeddedEtcdAuth(embeddedEtcd)()
 	defer func() {
 		embeddedEtcd.Server.Stop()
 		embeddedEtcd.Close()
